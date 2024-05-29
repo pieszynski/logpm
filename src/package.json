@@ -1,0 +1,20 @@
+{
+  "name": "logpm",
+  "type": "module",
+  "version": "0.1.1",
+  "description": "JavaScript semantic logging",
+  "main": "logpm.mjs",
+  "types": "logpm.d.mts",
+  "scripts": {
+    "build": "bash ./build.sh",
+    "package": "bash ./package.sh"
+  },
+  "author": "Przemysław Pieszyński",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@types/jasmine": "^5.1.4",
+    "jasmine": "^5.1.0",
+    "terser": "^5.31.0",
+    "typescript": "^5.4.5"
+  }
+}

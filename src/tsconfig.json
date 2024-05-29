@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "skipLibCheck": true,
+        "allowSyntheticDefaultImports": true,
+        "noImplicitAny": true,
+        "module": "esnext",
+        "target": "es2022",
+        "allowJs": true,
+        "strict": true,
+        "outDir": "dist",
+        "declaration": true
+    },
+    "files": ["logpm.mts", "logpm.spec.ts"],
+    "exclude": ["node_modules"]
+}
