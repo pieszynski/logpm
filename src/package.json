@@ -1,7 +1,7 @@
 {
   "name": "logpm",
   "type": "module",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "JavaScript semantic logging",
   "main": "logpm.mjs",
   "types": "logpm.d.mts",
@@ -11,6 +11,22 @@
   },
   "author": "Przemysław Pieszyński",
   "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pieszynski/logpm.git"
+  },
+  "keywords": [
+    "js",
+    "javascript",
+    "log",
+    "logging",
+    "semantic",
+    "sem"
+  ],
+  "bugs": {
+    "url": "https://github.com/pieszynski/logpm/issues"
+  },
+  "homepage": "https://github.com/pieszynski/logpm#readme",
   "devDependencies": {
     "@types/jasmine": "^5.1.4",
     "jasmine": "^5.1.0",
