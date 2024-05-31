@@ -27,6 +27,12 @@ export interface TokenizedMessage {
 export class Internals {
     #reTokens = /\{(?<token>[^{}]+?)\}/gim;
 
+    /**
+     *
+     * @param message Message to log with argument placeholders to be filled
+     * @param args Arguments to be inserted in message template
+     * @returns Evaluated message and tokens.
+     */
     tokenize(message: string, ...args: any[]): TokenizedMessage {
         // filled in message with tokens
         let msg = message || '';
