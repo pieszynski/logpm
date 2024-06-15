@@ -92,25 +92,50 @@ export class ConsoleLogStream implements LogStream {
 
 export class Logger {
     #context: string;
+    #scope?: any;
     #time: TimeProvider;
     #stream: LogStream;
 
     constructor(
-        context?: string,
+        context: string,
+        scope?: any,
         timeProvider?: TimeProvider,
         stream?: LogStream
     ) {
         this.#context = context || '';
+        this.#scope = scope || null;
         this.#time = timeProvider || new DefaultTimeProvider();
         this.#stream = stream || new ConsoleLogStream();
     }
 
+    /**
+     * Creates new sub scope from existing logger
+     * @param context New scope context name
+     * @param scope Optional scope data
+     * @returns {Logger}
+     */
+    scopeTo(context: string, scope?: any): Logger {
+        return new Logger(
+            context,
+            scope || this.#scope,
+            this.#time,
+            this.#stream
+        );
+    }
+
+    /**
+     * Log with level
+     * @param level Logging level
+     * @param message Message to log. May contain placeholders in format: {name}
+     * @param args Arguments to fill within placeholders. Order of placeholders matches order of arguments
+     */
     ll(level: LogLevelValues, message: string, ...args: any[]): void {
         const obj: any = {
             '@timestamp': this.#time.now,
             context: this.#context,
             level: LogLevelTextMap[level] || LogLevelTextMap[LogLevel.Info],
             message,
+            ...this.#scope,
         };
 
         const tokenized = _internals.tokenize(message, ...args);

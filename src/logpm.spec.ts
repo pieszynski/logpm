@@ -138,7 +138,7 @@ describe('Logger', function () {
     let log: Logger;
 
     beforeEach(function () {
-        log = new Logger(testContext, time, stream);
+        log = new Logger(testContext, null, time, stream);
     });
 
     it('should have levels', function () {
@@ -152,6 +152,7 @@ describe('Logger', function () {
     it('should consume three constructor parameters in specific order', function () {
         const log = new Logger(
             'default',
+            null,
             new TestTimeProvider(),
             new TestLogStream()
         );
@@ -188,6 +189,55 @@ describe('Logger', function () {
             context: testContext,
             level: 'warn',
             message: 'my Przemek has 15 times gwóźdź spelled',
+            name: 'Przemek',
+            count: 15,
+            NaMe: 'gwóźdź',
+        });
+    });
+
+    it('should use create scope', function () {
+        const subLog = log.scopeTo('sub-scope', { connection: '123p' });
+        subLog.ll(
+            LogLevel.Trace,
+            'my {name} has {count} times {NaMe} spelled',
+            'Przemek',
+            15,
+            'gwóźdź'
+        );
+        expect(stream.obj).toBeTruthy();
+        expect(stream.obj).toEqual({
+            '@timestamp': NowTime,
+            context: 'sub-scope',
+            level: 'trace',
+            message: 'my Przemek has 15 times gwóźdź spelled',
+            connection: '123p',
+            name: 'Przemek',
+            count: 15,
+            NaMe: 'gwóźdź',
+        });
+    });
+
+    it('should use create scope within scope and overwrite', function () {
+        const subLog = log.scopeTo('sub-scope', { connection: '123p' });
+        const subSecondLog = subLog.scopeTo('parser2', {
+            connection: 'ope3',
+            input: 'hello5',
+        });
+        subSecondLog.ll(
+            LogLevel.Trace,
+            'my {name} has {count} times {NaMe} spelled',
+            'Przemek',
+            15,
+            'gwóźdź'
+        );
+        expect(stream.obj).toBeTruthy();
+        expect(stream.obj).toEqual({
+            '@timestamp': NowTime,
+            context: 'parser2',
+            level: 'trace',
+            message: 'my Przemek has 15 times gwóźdź spelled',
+            connection: 'ope3',
+            input: 'hello5',
             name: 'Przemek',
             count: 15,
             NaMe: 'gwóźdź',
