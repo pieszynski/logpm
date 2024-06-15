@@ -3,10 +3,10 @@
 
 name: Publish package to NPM
 on:
-  push:
-    branches: [master]
   release:
-    types: [published]
+    types:
+      - created
+      - released
 
 defaults:
   run:
@@ -21,9 +21,25 @@ jobs:
         with:
           node-version: 20
       - run: echo "github.ref= ${{ github.ref }}, github.run_number= ${{ github.run_number }}."
+      - run: echo "github.event_name= ${{ github.event_name }}, github.event.action= ${{ github.event.action }}."
       - run: npm ci
       - run: npm run build
       - run: npm run package
-      # - run: npm config set '//registry.npmjs.org/:_authToken' "${{secrets.NPM_TOKEN}}"
-      # - run: npm publish
-      #   working-directory: ./src/publish
+
+      # - uses: Shopify/upload-to-release@v2.0.0
+      #   if: ${{ (github.event_name == 'release') && (github.event.action == 'created') }}
+      #   with:
+      #     name: logpm.mjs
+      #     path: src/publish/logpm.mjs
+      #     repo-token: ${{ secrets.GITHUB_TOKEN }}
+      #     content-type: application/javascript
+      # - uses: softprops/action-gh-release@v2.0.5
+      #   if: ${{ (github.event_name == 'release') && (github.event.action == 'created') }}
+      #   with:
+      #     files: src/publish/logpm.mjs
+
+      - run: npm config set '//registry.npmjs.org/:_authToken' "${{secrets.NPM_TOKEN}}"
+        if: ${{ (github.event_name == 'release') && (github.event.action == 'released') }}
+      - run: npm publish
+        if: ${{ (github.event_name == 'release') && (github.event.action == 'released') }}
+        working-directory: ./src/publish
