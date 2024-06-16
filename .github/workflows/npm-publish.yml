@@ -25,6 +25,8 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npm run package
+        env:
+          PM_VERSION: ${{ github.ref }}
 
       # - uses: Shopify/upload-to-release@v2.0.0
       #   if: ${{ (github.event_name == 'release') && (github.event.action == 'created') }}
