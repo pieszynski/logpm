@@ -164,6 +164,36 @@ describe('Logger', function () {
         expect(stream?.obj?.level).toEqual('info');
     });
 
+    it('should log with error level', function () {
+        log.e('text-{v}-{l}', 1, LogLevel.Error);
+        expect(stream?.obj?.level).toEqual('error');
+        expect(stream?.obj?.message).toEqual('text-1-1');
+    });
+
+    it('should log with warning level', function () {
+        log.w('text-{v}-{l}', 2, LogLevel.Warn);
+        expect(stream?.obj?.level).toEqual('warn');
+        expect(stream?.obj?.message).toEqual('text-2-2');
+    });
+
+    it('should log with information level', function () {
+        log.i('text-{v}-{l}', 3, LogLevel.Info);
+        expect(stream?.obj?.level).toEqual('info');
+        expect(stream?.obj?.message).toEqual('text-3-3');
+    });
+
+    it('should log with debug level', function () {
+        log.d('text-{v}-{l}', 4, LogLevel.Debug);
+        expect(stream?.obj?.level).toEqual('debug');
+        expect(stream?.obj?.message).toEqual('text-4-4');
+    });
+
+    it('should log with trace level', function () {
+        log.t('text-{v}-{l}', 5, LogLevel.Trace);
+        expect(stream?.obj?.level).toEqual('trace');
+        expect(stream?.obj?.message).toEqual('text-5-5');
+    });
+
     it('should produce simple message', function () {
         log.ll(LogLevel.Error, 'text1');
         expect(stream.obj).toBeTruthy();

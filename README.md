@@ -9,15 +9,15 @@ import { Logger, LogLevel } from "logpm";
 
 const logger = new Logger("main");
 
-logger.ll(LogLevel.Info, "hello {name}, how are you?", "Przemek");
+logger.ll(LogLevel.Info, "hello {name}, how are you?", "Przemek"); // or shorter: logger.i(...)
 
 const scopedLogger = logger.scopeTo("middleware", {
   connectionId: "ASDF443",
   username: "admin5",
 });
 
-scopedLogger.ll(LogLevel.Trace, "User connected");
-scopedLogger.ll(LogLevel.Trace, "Action {action} started", "buy");
+scopedLogger.t("User connected");
+scopedLogger.t("Action {action} started", "buy");
 ```
 
 gives console output of

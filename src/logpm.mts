@@ -1,3 +1,6 @@
+/**
+ * Available logging levels
+ */
 export const LogLevel = Object.freeze({
     Error: 1,
     Warn: 2,
@@ -15,7 +18,7 @@ const LogLevelTextMap = Object.freeze({
     5: 'trace',
 });
 
-export interface TokenizedMessage {
+interface TokenizedMessage {
     message: string;
     tokens: any;
 }
@@ -70,9 +73,16 @@ export class Internals {
 const _internals = new Internals();
 
 export interface TimeProvider {
+    /**
+     * Returns current time
+     * @returns Current time
+     */
     get now(): string;
 }
 
+/**
+ * Provides current time in UTC format
+ */
 export class DefaultTimeProvider implements TimeProvider {
     get now(): string {
         return new Date().toISOString();
@@ -80,9 +90,16 @@ export class DefaultTimeProvider implements TimeProvider {
 }
 
 export interface LogStream {
+    /**
+     * Writes log object to output of choice
+     * @param obj Log entity to write to log
+     */
     write(obj: any): void;
 }
 
+/**
+ * Writes logs as JSONs to STDOUT
+ */
 export class ConsoleLogStream implements LogStream {
     write(obj: any): void {
         const text = JSON.stringify(obj);
@@ -90,12 +107,23 @@ export class ConsoleLogStream implements LogStream {
     }
 }
 
+/**
+ * Semantic logging class
+ */
 export class Logger {
     #context: string;
     #scope?: any;
     #time: TimeProvider;
     #stream: LogStream;
 
+    /**
+     * Create Logger instance
+     * @constructor
+     * @param context (reqired) Name the context where operations are logged. Usually name of the class
+     * @param scope (optional) Common scope for all logged messages
+     * @param timeProvider (optional) Leave null for default behavior or provide custom way to assign timestamps
+     * @param stream (optional) Leave null for default behavior or pass custom nonblocking stream. Async operations are not supported and not desired
+     */
     constructor(
         context: string,
         scope?: any,
@@ -121,6 +149,51 @@ export class Logger {
             this.#time,
             this.#stream
         );
+    }
+
+    /**
+     * Error log
+     * @param message Message to log. May contain placeholders in format: {name}
+     * @param args Arguments to fill within placeholders. Order of placeholders matches order of arguments
+     */
+    e(message: string, ...args: any[]): void {
+        this.ll(LogLevel.Error, message, ...args);
+    }
+
+    /**
+     * Warning log
+     * @param message Message to log. May contain placeholders in format: {name}
+     * @param args Arguments to fill within placeholders. Order of placeholders matches order of arguments
+     */
+    w(message: string, ...args: any[]): void {
+        this.ll(LogLevel.Warn, message, ...args);
+    }
+
+    /**
+     * Information log
+     * @param message Message to log. May contain placeholders in format: {name}
+     * @param args Arguments to fill within placeholders. Order of placeholders matches order of arguments
+     */
+    i(message: string, ...args: any[]): void {
+        this.ll(LogLevel.Info, message, ...args);
+    }
+
+    /**
+     * Debug log
+     * @param message Message to log. May contain placeholders in format: {name}
+     * @param args Arguments to fill within placeholders. Order of placeholders matches order of arguments
+     */
+    d(message: string, ...args: any[]): void {
+        this.ll(LogLevel.Debug, message, ...args);
+    }
+
+    /**
+     * Trace (verbose) log
+     * @param message Message to log. May contain placeholders in format: {name}
+     * @param args Arguments to fill within placeholders. Order of placeholders matches order of arguments
+     */
+    t(message: string, ...args: any[]): void {
+        this.ll(LogLevel.Trace, message, ...args);
     }
 
     /**
