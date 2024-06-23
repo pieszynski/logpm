@@ -225,7 +225,42 @@ describe('Logger', function () {
         });
     });
 
-    it('should use create scope', function () {
+    it('should not freeze provided scope variable', function () {
+        const scope: any = { connection: '445x' };
+        const subLog = log.scopeTo('frz', scope);
+        subLog.e('ice');
+        expect(stream.obj).toBeTruthy();
+        expect(stream.obj).toEqual({
+            '@timestamp': NowTime,
+            context: 'frz',
+            level: 'error',
+            message: 'ice',
+            connection: '445x',
+        });
+
+        // assign new property to scope
+        scope.name = 'testing';
+        expect(scope.name).toEqual('testing');
+
+        // new property is not visible in log messages
+        subLog.e('snow {speed}m/s', 4);
+        expect(stream.obj).toBeTruthy();
+        expect(stream.obj).toEqual({
+            '@timestamp': NowTime,
+            context: 'frz',
+            level: 'error',
+            message: 'snow 4m/s',
+            speed: 4,
+            connection: '445x',
+        });
+        expect(stream.obj).not.toEqual(
+            jasmine.objectContaining({
+                name: 'testing',
+            })
+        );
+    });
+
+    it('should create scope', function () {
         const subLog = log.scopeTo('sub-scope', { connection: '123p' });
         subLog.ll(
             LogLevel.Trace,
@@ -247,7 +282,7 @@ describe('Logger', function () {
         });
     });
 
-    it('should use create scope within scope and overwrite', function () {
+    it('should create scope within scope and overwrite', function () {
         const subLog = log.scopeTo('sub-scope', { connection: '123p' });
         const subSecondLog = subLog.scopeTo('parser2', {
             connection: 'ope3',
@@ -268,6 +303,43 @@ describe('Logger', function () {
             message: 'my Przemek has 15 times gwóźdź spelled',
             connection: 'ope3',
             input: 'hello5',
+            name: 'Przemek',
+            count: 15,
+            NaMe: 'gwóźdź',
+        });
+    });
+
+    it('should create scope within scope and merge parent scope data', function () {
+        const subLog = log.scopeTo('sub-scope', { connection: 'aBo8S' });
+
+        subLog.w('data {action} in database', 'updated');
+        expect(stream.obj).toBeTruthy();
+        expect(stream.obj).toEqual({
+            '@timestamp': NowTime,
+            context: 'sub-scope',
+            level: 'warn',
+            message: 'data updated in database',
+            connection: 'aBo8S',
+            action: 'updated',
+        });
+
+        const subSecondLog = subLog.scopeTo('parser3', {
+            input: 'break7',
+        });
+        subSecondLog.i(
+            'my {name} has {count} times {NaMe} spelled',
+            'Przemek',
+            15,
+            'gwóźdź'
+        );
+        expect(stream.obj).toBeTruthy();
+        expect(stream.obj).toEqual({
+            '@timestamp': NowTime,
+            context: 'parser3',
+            level: 'info',
+            message: 'my Przemek has 15 times gwóźdź spelled',
+            connection: 'aBo8S',
+            input: 'break7',
             name: 'Przemek',
             count: 15,
             NaMe: 'gwóźdź',

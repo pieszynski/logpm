@@ -120,9 +120,9 @@ export class Logger {
      * Create Logger instance
      * @constructor
      * @param context (reqired) Name the context where operations are logged. Usually name of the class
-     * @param scope (optional) Common scope for all logged messages
-     * @param timeProvider (optional) Leave null for default behavior or provide custom way to assign timestamps
-     * @param stream (optional) Leave null for default behavior or pass custom nonblocking stream. Async operations are not supported and not desired
+     * @param scope (optional) Common scope object for all logged messages
+     * @param timeProvider (optional/advanced) Leave null for default behavior or provide custom way to assign timestamps
+     * @param stream (optional/advanced) Leave null for default behavior or pass custom nonblocking stream. Async operations are not supported and not desired
      */
     constructor(
         context: string,
@@ -131,7 +131,7 @@ export class Logger {
         stream?: LogStream
     ) {
         this.#context = context || '';
-        this.#scope = scope || null;
+        this.#scope = Object.freeze({ ...scope } || null);
         this.#time = timeProvider || new DefaultTimeProvider();
         this.#stream = stream || new ConsoleLogStream();
     }
@@ -143,12 +143,9 @@ export class Logger {
      * @returns {Logger}
      */
     scopeTo(context: string, scope?: any): Logger {
-        return new Logger(
-            context,
-            scope || this.#scope,
-            this.#time,
-            this.#stream
-        );
+        // merge current scope with provided scope
+        const innerScope = this.#scope ? { ...this.#scope, ...scope } : scope;
+        return new Logger(context, innerScope, this.#time, this.#stream);
     }
 
     /**
