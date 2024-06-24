@@ -131,6 +131,9 @@ export class Logger {
         stream?: LogStream
     ) {
         this.#context = context || '';
+        if (typeof this.#context !== 'string') {
+            throw new Error('Context must be a string');
+        }
         this.#scope = Object.freeze({ ...scope } || null);
         this.#time = timeProvider || new DefaultTimeProvider();
         this.#stream = stream || new ConsoleLogStream();

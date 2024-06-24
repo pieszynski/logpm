@@ -149,6 +149,17 @@ describe('Logger', function () {
         expect(LogLevel.Trace).toBe(5);
     });
 
+    it('should get context as string', function () {
+        expect(function () {
+            const log = new Logger(
+                <any>{ context: 'objctx' },
+                null,
+                new TestTimeProvider(),
+                new TestLogStream()
+            );
+        }).toThrow(new Error('Context must be a string'));
+    });
+
     it('should consume three constructor parameters in specific order', function () {
         const log = new Logger(
             'default',
@@ -222,6 +233,21 @@ describe('Logger', function () {
             name: 'Przemek',
             count: 15,
             NaMe: 'gwóźdź',
+        });
+    });
+
+    it('should even handle array as scope', function () {
+        const subLog = log.scopeTo('arry', ['one', 'two']);
+        subLog.e('indexer {n}', 55);
+        expect(stream.obj).toBeTruthy();
+        expect(stream.obj).toEqual({
+            '@timestamp': NowTime,
+            context: 'arry',
+            level: 'error',
+            message: 'indexer 55',
+            n: 55,
+            0: 'one',
+            1: 'two',
         });
     });
 

@@ -37,7 +37,7 @@ gives console output of
 
 Parameters:
 
-- `context` - (required) Name the context where operations are logged
+- `context` - (required) Name the context where operations are logged. Required type: _string_
 - `scope` - (optional) Common scope object for all logged messages
 - `timeProvider` - (optional/advanced) Leave null for default behavior or provide custom way to assign timestamps
 - `stream` - (optional/advanced) Leave null for default behavior or pass custom nonblocking stream. Async operations are not supported and not desired
@@ -51,3 +51,12 @@ Parameters:
 - `Logger.t` - log with trace/verbose level
 - `Logger.ll` - log with level provided as parameter
 - `Logger.scopeTo` - create sub context logger for specific task (context). If provided, scope will merge with existing scope
+
+## Design decisions
+
+- **No log level filtering**. All messages are important, some less some more. It is log forwarder's role to push them, and indexing engine to forget selected types - some sooner, other later and a few maybe never. Log level switching is cool but will not help answer questions like "_What happened yesterday at 17:46?_"
+- **Scope and variable merging**. Child scope values, when using `.scopeTo` or even during simple message logging may seem to be overwriten during log writing operations but this does not change the internally saved scopes inside logger instance. For now the order is as follows:
+  - parent scope
+  - child scope
+  - log operation's `@timestamp`, `context`, `level`, `message`
+  - variables read from log operation
