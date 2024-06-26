@@ -371,4 +371,68 @@ describe('Logger', function () {
             NaMe: 'gwóźdź',
         });
     });
+
+    it('should overwrite parent scope with child scope', function () {
+        const subLog = log.scopeTo('sub-scope', { connection: '123p' });
+        const subSecondLog = subLog.scopeTo('parser2', {
+            connection: 'ope3',
+        });
+        subSecondLog.ll(LogLevel.Trace, 'hello');
+        expect(stream.obj).toBeTruthy();
+        expect(stream.obj).toEqual(
+            jasmine.objectContaining({
+                context: 'parser2',
+                connection: 'ope3',
+            })
+        );
+    });
+
+    it('should overwrite scope with log operation fixed fields', function () {
+        const subLog = log.scopeTo('sub-scope', { level: 'fish' });
+        subLog.ll(LogLevel.Trace, 'hello');
+        expect(stream.obj).toBeTruthy();
+        expect(stream.obj).toEqual(
+            jasmine.objectContaining({
+                level: 'trace',
+                message: 'hello',
+            })
+        );
+    });
+
+    it('should overwrite scope with log operation method arguments', function () {
+        const subLog = log.scopeTo('sub-scope', { wheels: 4 });
+
+        subLog.ll(LogLevel.Trace, 'this car has {wheels} wheels', 7);
+        expect(stream.obj).toBeTruthy();
+        expect(stream.obj).toEqual(
+            jasmine.objectContaining({
+                level: 'trace',
+                message: 'this car has 7 wheels',
+                wheels: 7,
+            })
+        );
+
+        subLog.ll(LogLevel.Trace, 'starting {name} car', 'my');
+        expect(stream.obj).toBeTruthy();
+        expect(stream.obj).toEqual(
+            jasmine.objectContaining({
+                level: 'trace',
+                message: 'starting my car',
+                wheels: 4,
+                name: 'my',
+            })
+        );
+    });
+
+    it('should never overwrite fixed fields', function () {
+        const subLog = log.scopeTo('sub-scope', { level: 'fish' });
+        subLog.ll(LogLevel.Trace, 'water level is {level}', 'medium');
+        expect(stream.obj).toBeTruthy();
+        expect(stream.obj).toEqual(
+            jasmine.objectContaining({
+                level: 'trace',
+                message: 'water level is medium',
+            })
+        );
+    });
 });

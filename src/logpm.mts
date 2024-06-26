@@ -203,22 +203,30 @@ export class Logger {
      * @param args Arguments to fill within placeholders. Order of placeholders matches order of arguments
      */
     ll(level: LogLevelValues, message: string, ...args: any[]): void {
-        const obj: any = {
-            '@timestamp': this.#time.now,
-            context: this.#context,
-            level: LogLevelTextMap[level] || LogLevelTextMap[LogLevel.Info],
-            message,
+        // prepare minimum field set object
+        let obj: any = {
             ...this.#scope,
+            '@timestamp': '',
+            context: '',
+            level: '',
+            message,
         };
 
         const tokenized = _internals.tokenize(message, ...args);
-
-        obj.message = tokenized.message;
 
         for (let key of Object.getOwnPropertyNames(tokenized.tokens)) {
             // yes, property overwrites is allowed here
             obj[key] = tokenized.tokens[key];
         }
+
+        // overwite log operation's key fields
+        obj = {
+            ...obj,
+            '@timestamp': this.#time.now,
+            context: this.#context,
+            level: LogLevelTextMap[level] || LogLevelTextMap[LogLevel.Info],
+            message: tokenized.message,
+        };
 
         this.#stream.write(obj);
     }

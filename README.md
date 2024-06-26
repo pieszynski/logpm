@@ -58,5 +58,5 @@ Parameters:
 - **Scope and variable merging**. Child scope values, when using `.scopeTo` or even during simple message logging may seem to be overwriten during log writing operations but this does not change the internally saved scopes inside logger instance. For now the order is as follows:
   - parent scope
   - child scope
-  - log operation's `@timestamp`, `context`, `level`, `message`
   - variables read from log operation
+  - log operation's key fields `@timestamp`, `context`, `level`, `message`. These will never be overwitten.
